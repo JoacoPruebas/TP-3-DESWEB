@@ -1,12 +1,11 @@
 const productosData = require('../data/productosData');
 
 function obtenerProductos() {
-  return productosData.getAll();
+  return productosData.getProductos();
 }
 
 function agregarProducto(producto) {
-  // Aquí se podrían aplicar validaciones o reglas
-  productosData.add(producto);
+  productosData.addProducto(producto);
 }
 
 module.exports = { obtenerProductos, agregarProducto };
