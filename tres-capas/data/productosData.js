@@ -1,11 +1,11 @@
 let productos = [];
 
-function getAll() {
+function getProductos() {
   return productos;
 }
 
-function add(producto) {
+function addProducto(producto) {
   productos.push(producto);
 }
 
-module.exports = { getAll, add };
+module.exports = { getProductos, addProducto };
