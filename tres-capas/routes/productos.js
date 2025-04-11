@@ -2,10 +2,9 @@ const express = require('express');
 const router = express.Router();
 const productosService = require('../services/productosService');
 
-// Listar productos
+// Obtener productos
 router.get('/', (req, res) => {
-  const productos = productosService.obtenerProductos();
-  res.json(productos);
+  res.json(productosService.obtenerProductos());
 });
 
 // Agregar producto
