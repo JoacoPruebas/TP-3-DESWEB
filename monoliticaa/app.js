@@ -1,27 +1,69 @@
 const express = require('express');
 const app = express();
-app.use(express.json());
 
-// Almacenamiento en memoria (no persiste si se reinicia el servidor)
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Lista en memoria
 let productos = [];
 
-// Crear un producto
-app.post('/productos', (req, res) => {
-  const nuevoProducto = req.body;
-  productos.push(nuevoProducto);
-  res.status(201).json({ mensaje: 'Producto agregado correctamente' });
+// Página HTML con formulario, lista y botón para eliminar productos
+app.get('/', (req, res) => {
+  let listaHTML = productos.map(p => `
+    <li>
+      ${p.nombre} - $${p.precio}
+      <form action="/eliminar/${p.id}" method="POST" style="display:inline;">
+        <button type="submit">Eliminar</button>
+      </form>
+    </li>
+  `).join('');
+
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Productos</title>
+        <style>
+          body { font-family: Arial; margin: 2em; }
+          input, button { margin-top: 0.5em; display: block; }
+          ul { margin-top: 1em; list-style-type: none; padding: 0; }
+          li { margin-bottom: 0.5em; }
+          form { display: inline; }
+        </style>
+      </head>
+      <body>
+        <h1>Agregar Producto</h1>
+        <form action="/agregar" method="POST">
+          <input type="text" name="nombre" placeholder="Nombre del producto" required />
+          <input type="number" name="precio" placeholder="Precio" required />
+          <button type="submit">Agregar</button>
+        </form>
+        <h2>Lista de Productos</h2>
+        <ul>
+          ${listaHTML}
+        </ul>
+      </body>
+    </html>
+  `);
 });
 
-// Listar productos
-app.get('/productos', (req, res) => {
-  res.json(productos);
+// Ruta POST para agregar producto
+app.post('/agregar', (req, res) => {
+  const { nombre, precio } = req.body;
+
+  if (!nombre || !precio) {
+    return res.status(400).send('Faltan datos');
+  }
+
+  productos.push({ id: productos.length + 1, nombre, precio });
+  res.redirect('/');
 });
 
-// Eliminar producto por ID
-app.delete('/productos/:id', (req, res) => {
-  const id = req.params.id;
+// Ruta POST para eliminar producto por ID
+app.post('/eliminar/:id', (req, res) => {
+  const id = parseInt(req.params.id);
   productos = productos.filter(p => p.id !== id);
-  res.json({ mensaje: 'Producto eliminado si existía' });
+  res.redirect('/');
 });
 
 // Iniciar servidor
